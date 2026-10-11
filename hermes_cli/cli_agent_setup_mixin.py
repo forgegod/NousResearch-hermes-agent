@@ -4,6 +4,7 @@ imported lazily inside each method (import cycle)."""
 
 from __future__ import annotations
 
+import os
 import sys
 
 from rich.markup import escape as _escape
@@ -551,8 +552,12 @@ class CLIAgentSetupMixin:
         return session_meta
 
     def _restore_session_state(self, session_meta, *, quiet: bool = False) -> None:
-        """Restore cwd / yolo / model from the resumed session's metadata."""
-        self._restore_session_cwd(session_meta, quiet=quiet)
+        """Restore startup state; explicit launch cwd wins, unlike mid-chat /resume."""
+        if getattr(self, "_no_restore_cwd", False):
+            if "TERMINAL_CWD" in os.environ:
+                os.environ["TERMINAL_CWD"] = os.getcwd()
+        else:
+            self._restore_session_cwd(session_meta, quiet=quiet)
         self._restore_session_yolo(session_meta, quiet=quiet)
         self._restore_session_model(session_meta, quiet=quiet)
 

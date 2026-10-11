@@ -1676,6 +1676,7 @@ def main(
     output_format: str = "text",
     ignore_user_config: bool = False,
     ignore_rules: bool = False,
+    no_restore_cwd: bool = False,
 ):
     """
     Hermes Agent CLI - Interactive AI Assistant
@@ -1701,6 +1702,7 @@ def main(
         list_tools: List available tools and exit
         list_toolsets: List available toolsets and exit
         resume: Resume a previous session by its ID (e.g., 20260225_143052_a1b2c3)
+        no_restore_cwd: Keep the launch directory when restoring startup session state.
         worktree: Run in an isolated git worktree (for parallel agents). Alias: -w
         w: Shorthand for --worktree
     
@@ -1750,6 +1752,7 @@ def main(
     wt_info = _join_worktree() if _join_worktree is not None else None
     if _join_worktree is not None and not wt_info:
         return
+    cli._no_restore_cwd = no_restore_cwd
 
     # Inject worktree context into agent's system prompt
     if wt_info:
